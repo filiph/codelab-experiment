@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.red,
+          seedColor: Colors.deepOrange,
           // brightness: Brightness.dark,
         ),
       ),
@@ -46,13 +46,42 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   List<WordPair> history = [];
 
+  List<WordPair> favorites = [];
+
   WordPair pair = WordPair.random();
 
   GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
+      endDrawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant,
+              ),
+              child: Text('Favorites'),
+            ),
+            for (var pair in favorites)
+              ListTile(
+                title: Text(pair.asLowerCase),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      favorites.remove(pair);
+                    });
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
       body: Center(
         child: FractionallySizedBox(
           widthFactor: 0.8,
@@ -109,10 +138,29 @@ class _MainScreenState extends State<MainScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  if (favorites.isNotEmpty)
+                    TextButton.icon(
+                      icon: Icon(Icons.list),
+                      label: Text('Favorites'),
+                      onPressed: () {
+                        scaffoldKey.currentState?.openEndDrawer();
+                      },
+                    ),
+                  SizedBox(width: 8),
                   ElevatedButton.icon(
-                    icon: Icon(Icons.favorite_border),
+                    icon: Icon(favorites.contains(pair)
+                        ? Icons.favorite
+                        : Icons.favorite_border),
                     label: Text('Like'),
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        if (favorites.contains(pair)) {
+                          favorites.remove(pair);
+                        } else {
+                          favorites.add(pair);
+                        }
+                      });
+                    },
                   ),
                   SizedBox(width: 8),
                   OutlinedButton.icon(
