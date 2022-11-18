@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
+          seedColor: Colors.red,
           // brightness: Brightness.dark,
         ),
       ),
@@ -86,6 +86,7 @@ class _MainScreenState extends State<MainScreen> {
                       });
                     },
                   ),
+                  SizedBox(width: 8),
                 ],
               ),
             ],
