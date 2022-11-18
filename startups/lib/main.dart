@@ -44,7 +44,11 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  List<WordPair> history = [];
+
   WordPair pair = WordPair.random();
+
+  GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +60,48 @@ class _MainScreenState extends State<MainScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // XXX START HERE - a list of past words?
+              Expanded(
+                flex: 2,
+                child: AnimatedList(
+                  reverse: true,
+                  key: listKey,
+                  itemBuilder: (context, index, animation) {
+                    var historicalPair = history[index];
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SizeTransition(
+                        sizeFactor: animation,
+                        child: Center(
+                          child: Opacity(
+                            opacity: ((7 - index) / 7).clamp(0, 1),
+                            child: TextButton(
+                              onPressed: historicalPair == pair
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        if (!history.contains(pair)) {
+                                          history.insert(0, pair);
+                                          listKey.currentState?.insertItem(0);
+                                        }
+                                        pair = historicalPair;
+                                      });
+                                    },
+                              child: Text(historicalPair.asLowerCase),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 16),
               Card(
                 color: Theme.of(context).colorScheme.primary,
-                child: Center(
-                    child: Padding(
+                child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: PairDisplay(pair: pair),
-                )),
+                ),
               ),
               SizedBox(
                 height: 8,
@@ -72,8 +110,8 @@ class _MainScreenState extends State<MainScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton.icon(
-                    icon: Icon(Icons.add),
-                    label: Text('Add'),
+                    icon: Icon(Icons.favorite_border),
+                    label: Text('Like'),
                     onPressed: () {},
                   ),
                   SizedBox(width: 8),
@@ -82,6 +120,10 @@ class _MainScreenState extends State<MainScreen> {
                     label: Text('Next'),
                     onPressed: () {
                       setState(() {
+                        if (!history.contains(pair)) {
+                          history.insert(0, pair);
+                          listKey.currentState?.insertItem(0);
+                        }
                         pair = WordPair.random();
                       });
                     },
@@ -89,6 +131,7 @@ class _MainScreenState extends State<MainScreen> {
                   SizedBox(width: 8),
                 ],
               ),
+              Spacer(),
             ],
           ),
         ),
@@ -114,7 +157,7 @@ class PairDisplay extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
           ),
-          // TextSpan(text: ' '),
+          TextSpan(text: '​' /* zero width space */),
           TextSpan(
             text: pair.second,
             style: Theme.of(context).textTheme.displayMedium!.copyWith(
@@ -124,6 +167,7 @@ class PairDisplay extends StatelessWidget {
           ),
         ],
       ),
+      textAlign: TextAlign.center,
     );
   }
 }
