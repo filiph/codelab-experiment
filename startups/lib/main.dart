@@ -3,21 +3,68 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
-  runApp(StartupApp());
+  runApp(MyApp());
 }
 
-class MainScreen extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  final GoRouter _router = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) {
+          return MainScreen();
+        },
+      ),
+    ],
+  );
+
+  MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      routerConfig: _router,
+      title: 'Startup App',
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.dark,
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 300,
-          childAspectRatio: 16 / 9,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Transform(
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.003)
+                ..rotateX(0.5),
+              child: WordCard(0),
+            ),
+            ElevatedButton.icon(
+              icon: Icon(Icons.add),
+              label: Text('Add'),
+              onPressed: () {},
+            ),
+            ElevatedButton.icon(
+              icon: Icon(Icons.refresh),
+              label: Text('Next'),
+              onPressed: () {},
+            ),
+          ],
         ),
-        itemBuilder: (BuildContext context, int index) {
-          return WordCard(index);
-        },
       ),
     );
   }
@@ -42,55 +89,34 @@ class WordCard extends StatelessWidget {
     final pair = getWordPairAt(index);
     final color = Colors.primaries[index % Colors.primaries.length];
 
-    return Card(
-      color: color,
-      // surfaceTintColor: Colors.primaries[index % Colors.primaries.length],
-      child: InkWell(
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => DetailPage(pair, color),
-        )),
-        child: Center(
-          child: Hero(
-            tag: 'pair${pair.toString()}',
-            child: Text(
-              pair.asLowerCase,
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                shadows: const [
-                  Shadow(blurRadius: 6),
-                ],
+    return SizedBox(
+      width: 300,
+      height: 100,
+      child: Card(
+        color: color,
+        // surfaceTintColor: Colors.primaries[index % Colors.primaries.length],
+        child: InkWell(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => DetailPage(pair, color),
+          )),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Hero(
+                tag: 'pair${pair.toString()}',
+                child: Text(
+                  pair.asLowerCase,
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    shadows: const [
+                      Shadow(blurRadius: 6),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class StartupApp extends StatelessWidget {
-  final GoRouter _router = GoRouter(
-    routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) {
-          return MainScreen();
-        },
-      ),
-    ],
-  );
-
-  StartupApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: _router,
-      title: 'Startup App',
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-      ),
-      themeMode: ThemeMode.dark,
     );
   }
 }
