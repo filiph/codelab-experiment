@@ -101,22 +101,19 @@ class _MainScreenState extends State<MainScreen> {
                       child: SizeTransition(
                         sizeFactor: animation,
                         child: Center(
-                          child: Opacity(
-                            opacity: ((7 - index) / 7).clamp(0, 1),
-                            child: TextButton(
-                              onPressed: historicalPair == pair
-                                  ? null
-                                  : () {
-                                      setState(() {
-                                        if (!history.contains(pair)) {
-                                          history.insert(0, pair);
-                                          listKey.currentState?.insertItem(0);
-                                        }
-                                        pair = historicalPair;
-                                      });
-                                    },
-                              child: Text(historicalPair.asLowerCase),
-                            ),
+                          child: TextButton(
+                            onPressed: historicalPair == pair
+                                ? null
+                                : () {
+                                    setState(() {
+                                      if (!history.contains(pair)) {
+                                        history.insert(0, pair);
+                                        listKey.currentState?.insertItem(0);
+                                      }
+                                      pair = historicalPair;
+                                    });
+                                  },
+                            child: Text(historicalPair.asLowerCase),
                           ),
                         ),
                       ),
@@ -218,13 +215,4 @@ class PairDisplay extends StatelessWidget {
       textAlign: TextAlign.center,
     );
   }
-}
-
-final List<WordPair> _wordPairs = [];
-
-WordPair getWordPairAt(int index) {
-  while (index >= _wordPairs.length) {
-    _wordPairs.addAll(generateWordPairs().take(50));
-  }
-  return _wordPairs[index];
 }
