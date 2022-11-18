@@ -27,9 +27,13 @@ class MyApp extends StatelessWidget {
       title: 'Startup App',
       darkTheme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
+        // brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepOrange,
+          // brightness: Brightness.dark,
+        ),
       ),
-      themeMode: ThemeMode.dark,
+      // themeMode: ThemeMode.dark,
     );
   }
 }
@@ -40,32 +44,80 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  WordPair pair = WordPair.random();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Transform(
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.003)
-                ..rotateX(0.5),
-              child: WordCard(0),
-            ),
-            ElevatedButton.icon(
-              icon: Icon(Icons.add),
-              label: Text('Add'),
-              onPressed: () {},
-            ),
-            ElevatedButton.icon(
-              icon: Icon(Icons.refresh),
-              label: Text('Next'),
-              onPressed: () {},
-            ),
-          ],
+        child: FractionallySizedBox(
+          widthFactor: 0.8,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Card(
+                color: Theme.of(context).colorScheme.primary,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: PairDisplay(pair: pair),
+                ),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    icon: Icon(Icons.add),
+                    label: Text('Add'),
+                    onPressed: () {},
+                  ),
+                  SizedBox(width: 8),
+                  OutlinedButton.icon(
+                    icon: Icon(Icons.refresh),
+                    label: Text('Next'),
+                    onPressed: () {
+                      setState(() {
+                        pair = WordPair.random();
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+class PairDisplay extends StatelessWidget {
+  final WordPair pair;
+
+  const PairDisplay({Key? key, required this.pair}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          pair.first,
+          style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                fontWeight: FontWeight.w100,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
+        Text(
+          pair.second,
+          style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+        ),
+      ],
     );
   }
 }
@@ -77,95 +129,4 @@ WordPair getWordPairAt(int index) {
     _wordPairs.addAll(generateWordPairs().take(50));
   }
   return _wordPairs[index];
-}
-
-class WordCard extends StatelessWidget {
-  final int index;
-
-  const WordCard(this.index, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final pair = getWordPairAt(index);
-    final color = Colors.primaries[index % Colors.primaries.length];
-
-    return SizedBox(
-      width: 300,
-      height: 100,
-      child: Card(
-        color: color,
-        // surfaceTintColor: Colors.primaries[index % Colors.primaries.length],
-        child: InkWell(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => DetailPage(pair, color),
-          )),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Center(
-              child: Hero(
-                tag: 'pair${pair.toString()}',
-                child: Text(
-                  pair.asLowerCase,
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    shadows: const [
-                      Shadow(blurRadius: 6),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class DetailPage extends StatefulWidget {
-  final WordPair pair;
-
-  final Color color;
-
-  const DetailPage(this.pair, this.color, {super.key});
-
-  @override
-  State<DetailPage> createState() => _DetailPageState();
-}
-
-class _DetailPageState extends State<DetailPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          // backgroundColor: widget.color,
-          ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
-            child: Hero(
-              tag: 'pair${widget.pair.toString()}',
-              child: Card(
-                color: widget.color,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(100),
-                    child: Text(
-                      widget.pair.asLowerCase,
-                      style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                        shadows: const [
-                          Shadow(blurRadius: 6),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
