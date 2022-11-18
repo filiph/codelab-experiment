@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         // brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepOrange,
+          seedColor: Colors.green,
           // brightness: Brightness.dark,
         ),
       ),
@@ -54,13 +54,16 @@ class _MainScreenState extends State<MainScreen> {
           widthFactor: 0.8,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // XXX START HERE - a list of past words?
               Card(
                 color: Theme.of(context).colorScheme.primary,
-                child: Padding(
+                child: Center(
+                    child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: PairDisplay(pair: pair),
-                ),
+                )),
               ),
               SizedBox(
                 height: 8,
@@ -100,24 +103,26 @@ class PairDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          pair.first,
-          style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                fontWeight: FontWeight.w100,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-        ),
-        Text(
-          pair.second,
-          style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-        ),
-      ],
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: pair.first,
+            style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                  fontWeight: FontWeight.w100,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+          ),
+          // TextSpan(text: ' '),
+          TextSpan(
+            text: pair.second,
+            style: Theme.of(context).textTheme.displayMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+          ),
+        ],
+      ),
     );
   }
 }
