@@ -23,13 +23,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       routerConfig: _router,
       title: 'Startup App',
       darkTheme: ThemeData(
         useMaterial3: true,
         // brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepOrange,
+          seedColor: Colors.deepPurple,
           // brightness: Brightness.dark,
         ),
       ),
@@ -44,15 +45,15 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  List<WordPair> history = [];
+  var history = [];
 
-  List<WordPair> favorites = [];
+  var favorites = [];
 
-  WordPair pair = WordPair.random();
+  var pair = WordPair.random();
 
-  GlobalKey<AnimatedListState> listKey = GlobalKey<AnimatedListState>();
+  var listKey = GlobalKey<AnimatedListState>();
 
-  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  var scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -82,102 +83,112 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
       ),
-      body: Center(
-        child: FractionallySizedBox(
-          widthFactor: 0.8,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                flex: 2,
-                child: AnimatedList(
-                  reverse: true,
-                  key: listKey,
-                  itemBuilder: (context, index, animation) {
-                    var historicalPair = history[index];
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SizeTransition(
-                        sizeFactor: animation,
-                        child: Center(
-                          child: TextButton(
-                            onPressed: historicalPair == pair
-                                ? null
-                                : () {
-                                    setState(() {
-                                      if (!history.contains(pair)) {
-                                        history.insert(0, pair);
-                                        listKey.currentState?.insertItem(0);
-                                      }
-                                      pair = historicalPair;
-                                    });
-                                  },
-                            child: Text(historicalPair.asLowerCase),
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+              Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.6),
+            ],
+          ),
+        ),
+        child: Center(
+          child: FractionallySizedBox(
+            widthFactor: 0.8,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: AnimatedList(
+                    reverse: true,
+                    key: listKey,
+                    itemBuilder: (context, index, animation) {
+                      var historicalPair = history[index];
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SizeTransition(
+                          sizeFactor: animation,
+                          child: Center(
+                            child: TextButton(
+                              onPressed: historicalPair == pair
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        if (!history.contains(pair)) {
+                                          history.insert(0, pair);
+                                          listKey.currentState?.insertItem(0);
+                                        }
+                                        pair = historicalPair;
+                                      });
+                                    },
+                              child: Text(historicalPair.asLowerCase),
+                            ),
                           ),
                         ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 16),
+                Card(
+                  color: Theme.of(context).colorScheme.primary,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: PairDisplay(pair: pair),
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (favorites.isNotEmpty)
+                      TextButton.icon(
+                        icon: Icon(Icons.list),
+                        label: Text('Favorites'),
+                        onPressed: () {
+                          scaffoldKey.currentState?.openEndDrawer();
+                        },
                       ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 16),
-              Card(
-                color: Theme.of(context).colorScheme.primary,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: PairDisplay(pair: pair),
-                ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (favorites.isNotEmpty)
-                    TextButton.icon(
-                      icon: Icon(Icons.list),
-                      label: Text('Favorites'),
+                    SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      icon: Icon(favorites.contains(pair)
+                          ? Icons.favorite
+                          : Icons.favorite_border),
+                      label: Text('Like'),
                       onPressed: () {
-                        scaffoldKey.currentState?.openEndDrawer();
+                        setState(() {
+                          if (favorites.contains(pair)) {
+                            favorites.remove(pair);
+                          } else {
+                            favorites.add(pair);
+                          }
+                        });
                       },
                     ),
-                  SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    icon: Icon(favorites.contains(pair)
-                        ? Icons.favorite
-                        : Icons.favorite_border),
-                    label: Text('Like'),
-                    onPressed: () {
-                      setState(() {
-                        if (favorites.contains(pair)) {
-                          favorites.remove(pair);
-                        } else {
-                          favorites.add(pair);
-                        }
-                      });
-                    },
-                  ),
-                  SizedBox(width: 8),
-                  OutlinedButton.icon(
-                    icon: Icon(Icons.refresh),
-                    label: Text('Next'),
-                    onPressed: () {
-                      setState(() {
-                        if (!history.contains(pair)) {
-                          history.insert(0, pair);
-                          listKey.currentState?.insertItem(0);
-                        }
-                        pair = WordPair.random();
-                      });
-                    },
-                  ),
-                  SizedBox(width: 8),
-                ],
-              ),
-              Spacer(),
-            ],
+                    SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      icon: Icon(Icons.refresh),
+                      label: Text('Next'),
+                      onPressed: () {
+                        setState(() {
+                          if (!history.contains(pair)) {
+                            history.insert(0, pair);
+                            listKey.currentState?.insertItem(0);
+                          }
+                          pair = WordPair.random();
+                        });
+                      },
+                    ),
+                    SizedBox(width: 8),
+                  ],
+                ),
+                Spacer(),
+              ],
+            ),
           ),
         ),
       ),
