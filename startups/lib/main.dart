@@ -118,37 +118,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class FavoritesPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: GridView.extent(
-        maxCrossAxisExtent: 400,
-        childAspectRatio: 16 / 3,
-        children: [
-          for (final favorite in appState.favorites)
-            ListTile(
-              leading: Icon(
-                Icons.favorite,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              title: Text(
-                favorite.asLowerCase,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 class GeneratorPage extends StatelessWidget {
-  GeneratorPage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -249,6 +219,34 @@ class PairDisplay extends StatelessWidget {
         ],
       ),
       textAlign: TextAlign.center,
+    );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: GridView.extent(
+        maxCrossAxisExtent: 400,
+        childAspectRatio: 16 / 3,
+        children: [
+          for (final favorite in appState.favorites)
+            ListTile(
+              leading: Icon(
+                Icons.favorite,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              title: Text(
+                favorite.asLowerCase,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
