@@ -17,9 +17,7 @@ class MyApp extends StatelessWidget {
         title: 'Namer App',
         darkTheme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepOrange,
-          ),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         ),
         home: MainScreen(),
       ),
@@ -127,7 +125,6 @@ class GeneratorPage extends StatelessWidget {
       child: FractionallySizedBox(
         widthFactor: 0.8,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
@@ -140,9 +137,7 @@ class GeneratorPage extends StatelessWidget {
                       child: TextButton(
                         onPressed: historicalPair == appState.current
                             ? null
-                            : () {
-                                appState.makeCurrent(historicalPair);
-                              },
+                            : () => appState.makeCurrent(historicalPair),
                         child: Text(historicalPair.asLowerCase),
                       ),
                     ),
@@ -150,18 +145,10 @@ class GeneratorPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16),
-            Card(
-              color: Theme.of(context).colorScheme.primary,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: PairDisplay(pair: appState.current),
-              ),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            BigCard(appState.current),
+            SizedBox(height: 8),
+            Wrap(
+              alignment: WrapAlignment.end,
               children: [
                 ElevatedButton.icon(
                   icon: Icon(appState.favorites.contains(appState.current)
@@ -191,34 +178,39 @@ class GeneratorPage extends StatelessWidget {
   }
 }
 
-class PairDisplay extends StatelessWidget {
+class BigCard extends StatelessWidget {
   final WordPair pair;
 
-  const PairDisplay({Key? key, required this.pair}) : super(key: key);
+  const BigCard(this.pair);
 
   @override
   Widget build(BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        children: [
+    var theme = Theme.of(context);
+    var style = theme.textTheme.displayMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+    );
+
+    return Card(
+      color: theme.colorScheme.primary,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text.rich(
           TextSpan(
-            text: pair.first,
-            style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                  fontWeight: FontWeight.w100,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
+            children: [
+              TextSpan(
+                text: pair.first,
+                style: style.copyWith(fontWeight: FontWeight.w100),
+              ),
+              TextSpan(text: '​' /* zero width space */),
+              TextSpan(
+                text: pair.second,
+                style: style.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
-          TextSpan(text: '​' /* zero width space */),
-          TextSpan(
-            text: pair.second,
-            style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-          ),
-        ],
+          textAlign: TextAlign.center,
+        ),
       ),
-      textAlign: TextAlign.center,
     );
   }
 }
@@ -227,6 +219,7 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
+    var theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -238,11 +231,11 @@ class FavoritesPage extends StatelessWidget {
             ListTile(
               leading: Icon(
                 Icons.favorite,
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.colorScheme.primary,
               ),
               title: Text(
                 favorite.asLowerCase,
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: theme.textTheme.bodyLarge,
               ),
             ),
         ],
