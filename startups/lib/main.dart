@@ -46,11 +46,6 @@ class MyAppState extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-  void makeCurrent(WordPair pair) {
-    current = pair;
-    notifyListeners();
-  }
 }
 
 class MainScreen extends StatefulWidget {
@@ -102,10 +97,7 @@ class _MainScreenState extends State<MainScreen> {
               Expanded(
                 child: Container(
                   color: Theme.of(context).colorScheme.secondaryContainer,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 100),
-                    child: page,
-                  ),
+                  child: page,
                 ),
               ),
             ],
@@ -121,59 +113,48 @@ class GeneratorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
 
-    return Center(
-      child: FractionallySizedBox(
-        widthFactor: 0.8,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          flex: 2,
+          child: ListView(
+            reverse: true,
+            children: [
+              for (var historicalPair in appState.history)
+                Center(
+                  child: Text(historicalPair.asLowerCase),
+                ),
+            ],
+          ),
+        ),
+        SizedBox(height: 16),
+        BigCard(appState.current),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Expanded(
-              flex: 2,
-              child: ListView(
-                reverse: true,
-                children: [
-                  for (var historicalPair in appState.history)
-                    Center(
-                      child: TextButton(
-                        onPressed: historicalPair == appState.current
-                            ? null
-                            : () => appState.makeCurrent(historicalPair),
-                        child: Text(historicalPair.asLowerCase),
-                      ),
-                    ),
-                ],
-              ),
+            ElevatedButton.icon(
+              icon: Icon(appState.favorites.contains(appState.current)
+                  ? Icons.favorite
+                  : Icons.favorite_border),
+              label: Text('Like'),
+              onPressed: () {
+                appState.toggleCurrentFavorite();
+              },
             ),
-            SizedBox(height: 16),
-            BigCard(appState.current),
-            SizedBox(height: 8),
-            Wrap(
-              alignment: WrapAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  icon: Icon(appState.favorites.contains(appState.current)
-                      ? Icons.favorite
-                      : Icons.favorite_border),
-                  label: Text('Like'),
-                  onPressed: () {
-                    appState.toggleCurrentFavorite();
-                  },
-                ),
-                SizedBox(width: 8),
-                OutlinedButton.icon(
-                  icon: Icon(Icons.refresh),
-                  label: Text('Next'),
-                  onPressed: () {
-                    appState.generateNext();
-                  },
-                ),
-                SizedBox(width: 8),
-              ],
+            SizedBox(width: 8),
+            ElevatedButton.icon(
+              icon: Icon(Icons.refresh),
+              label: Text('Next'),
+              onPressed: () {
+                appState.generateNext();
+              },
             ),
-            Spacer(),
+            SizedBox(width: 28),
           ],
         ),
-      ),
+        Spacer(),
+      ],
     );
   }
 }
@@ -181,7 +162,7 @@ class GeneratorPage extends StatelessWidget {
 class BigCard extends StatelessWidget {
   final WordPair pair;
 
-  const BigCard(this.pair);
+  BigCard(this.pair);
 
   @override
   Widget build(BuildContext context) {
@@ -191,24 +172,20 @@ class BigCard extends StatelessWidget {
     );
 
     return Card(
+      margin: EdgeInsets.all(24),
       color: theme.colorScheme.primary,
       child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: pair.first,
-                style: style.copyWith(fontWeight: FontWeight.w100),
-              ),
-              TextSpan(text: '​' /* zero width space */),
-              TextSpan(
-                text: pair.second,
-                style: style.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          textAlign: TextAlign.center,
+        padding: EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(pair.first,
+                style: style.copyWith(fontWeight: FontWeight.w100)),
+            Text(
+              pair.second,
+              style: style.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );
@@ -222,10 +199,8 @@ class FavoritesPage extends StatelessWidget {
     var theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.all(16),
-      child: GridView.extent(
-        maxCrossAxisExtent: 400,
-        childAspectRatio: 16 / 3,
+      padding: EdgeInsets.all(16),
+      child: ListView(
         children: [
           for (final favorite in appState.favorites)
             ListTile(
