@@ -15,11 +15,11 @@ class MyApp extends StatelessWidget {
       create: (BuildContext context) => MyAppState(),
       child: MaterialApp(
         title: 'Namer App',
-        darkTheme: ThemeData(
+        theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         ),
-        home: MainScreen(),
+        home: HomeScreen(),
       ),
     );
   }
@@ -48,12 +48,12 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class MainScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _HomeScreenState extends State<HomeScreen> {
   var selectedIndex = 0;
 
   @override
