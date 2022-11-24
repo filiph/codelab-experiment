@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         ),
-        home: HomeScreen(),
+        home: MyHomePage(),
       ),
     );
   }
@@ -48,12 +48,12 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class HomeScreen extends StatefulWidget {
+class MyHomePage extends StatefulWidget {
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
 
   @override
