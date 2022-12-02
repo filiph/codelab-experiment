@@ -26,24 +26,19 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  // Nothing here yet.
+  var pair = WordPair.random();
 }
 
-class MyHomePage extends StatefulWidget {
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  var current = WordPair.random();
-
+class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
     return Scaffold(
       body: Column(
         children: [
           Text('A random idea:'),
-          Text(current.asLowerCase),
+          Text(appState.pair.asLowerCase),
         ],
       ),
     );
