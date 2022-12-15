@@ -36,4 +36,26 @@ void main() {
 
     expect(nextPair, isNot(firstPair));
   });
+
+  testWidgets('Tapping "Like" changes icon', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    Finder findElevatedButtonByIcon(IconData icon) {
+      return find.descendant(
+        of: find.bySubtype<ElevatedButton>(),
+        matching: find.byIcon(icon),
+      );
+    }
+
+    // At start: an outlined heart icon.
+    expect(findElevatedButtonByIcon(Icons.favorite_border), findsOneWidget);
+    expect(findElevatedButtonByIcon(Icons.favorite), findsNothing);
+
+    await tester.tap(find.text('Like'));
+    await tester.pumpAndSettle();
+
+    // After tap: a full heart icon.
+    expect(findElevatedButtonByIcon(Icons.favorite_border), findsNothing);
+    expect(findElevatedButtonByIcon(Icons.favorite), findsOneWidget);
+  });
 }
