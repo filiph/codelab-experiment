@@ -12,29 +12,38 @@ void main() {
   testWidgets('Tapping button changes word pair', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
-    final wordPairWidget = find.byType(BigCard);
-    expect(wordPairWidget, findsOneWidget);
-
-    String? findWordPair() {
+    String findWordPair() {
       final wordPairTextWidget = tester.widget<Text>(find.descendant(
         of: find.byType(BigCard),
         matching: find.byType(Text),
       ));
-      return wordPairTextWidget.data;
+      return wordPairTextWidget.data!;
     }
 
-    final firstPair = findWordPair();
+    // Tap several times and keep a list of word pair values.
+    const tryCount = 5;
+    final pairs = <String>[
+      findWordPair(),
+    ];
+    for (var i = 1; i < tryCount; i++) {
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      pairs.add(findWordPair());
+    }
 
-    // Sanity check. Finding the word pair twice will have the same result.
-    final firstPairDuplicate = findWordPair();
-    expect(firstPair, equals(firstPairDuplicate));
-
-    await tester.tap(find.text('Next'));
-    await tester.pumpAndSettle();
-
-    final nextPair = findWordPair();
-
-    expect(nextPair, isNot(firstPair));
+    expect(
+      // Converting the list to a set to remove duplicates.
+      pairs.toSet(),
+      // An occassional duplicate word pair is okay and expected.
+      // We only fail this test when there is zero variance - all the
+      // word pairs are the same, even though we clicked 'Next' several times.
+      hasLength(greaterThan(1)),
+      reason: 'After clicking $tryCount times, '
+          'the app should have generated at least two different word pairs. '
+          'Instead, the app showed these: $pairs. '
+          'That almost certainly means that the word pair is not being '
+          'randomly generated at all. The button does not work.',
+    );
   });
 
   testWidgets('Tapping "Like" changes icon', (WidgetTester tester) async {
