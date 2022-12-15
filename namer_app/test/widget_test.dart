@@ -13,13 +13,10 @@ void main() {
     await tester.pumpWidget(const MyApp());
 
     String findWordPair() {
-      final wordPairTextWidget = tester
-          // Get all Text widgets...
-          .widgetList<Text>(find.byType(Text))
-          // ... skip one ('A random idea:') ...
-          .skip(1)
-          // ... and take the first after it.
-          .first;
+      final wordPairTextWidget = tester.widget<Text>(find.descendant(
+        of: find.byType(BigCard),
+        matching: find.byType(Text),
+      ));
       return wordPairTextWidget.data!;
     }
 
