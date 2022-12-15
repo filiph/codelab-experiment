@@ -67,4 +67,45 @@ void main() {
     expect(findElevatedButtonByIcon(Icons.favorite_border), findsNothing);
     expect(findElevatedButtonByIcon(Icons.favorite), findsOneWidget);
   });
+
+  testWidgets('Liked word pair shows up in Favorites',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    // Find the currently shown word pair.
+    final wordPairTextWidget = tester.widget<Text>(find.descendant(
+      of: find.byType(BigCard),
+      matching: find.byType(Text),
+    ));
+    final current = wordPairTextWidget.data!;
+
+    // Go to the Favorites page.
+    await tester.tap(find.descendant(
+      of: find.byType(NavigationRail),
+      matching: find.byIcon(Icons.favorite),
+    ));
+    await tester.pumpAndSettle();
+
+    // Not there yet.
+    expect(find.text(current), findsNothing);
+
+    // Go back to the Generator page.
+    await tester.tap(find.descendant(
+      of: find.byType(NavigationRail),
+      matching: find.byIcon(Icons.home),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Like'));
+
+    // Go to Favorites page once again.
+    await tester.tap(find.descendant(
+      of: find.byType(NavigationRail),
+      matching: find.byIcon(Icons.favorite),
+    ));
+    await tester.pumpAndSettle();
+
+    // Should be there.
+    expect(find.text(current), findsOneWidget);
+  });
 }
