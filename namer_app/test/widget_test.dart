@@ -1,3 +1,4 @@
+import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,11 +13,15 @@ void main() {
   testWidgets('Tapping button changes word pair', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
+    final wordPairWidget = find.byType(BigCard);
+    expect(wordPairWidget, findsOneWidget);
+
     String? findWordPair() {
-      final textWidgets = tester.widgetList<Text>(find.byType(Text));
-      // Skip the first widget ('A random idea') and take the next one.
-      final wordPairWidget = textWidgets.skip(1).first;
-      return wordPairWidget.data;
+      final wordPairTextWidget = tester.widget<Text>(find.descendant(
+        of: find.byType(BigCard),
+        matching: find.byType(Text),
+      ));
+      return wordPairTextWidget.data;
     }
 
     final firstPair = findWordPair();
